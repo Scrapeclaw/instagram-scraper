@@ -1,0 +1,38 @@
+{
+  "google_search": {
+    "enabled": true,
+    "api_key": "",
+    "search_engine_id": "",
+    "queries_per_location": 3
+  },
+  "scraper": {
+    "headless": false,
+    "min_followers": 1000,
+    "download_thumbnails": true,
+    "max_thumbnails": 6,
+    "delay_between_profiles": [3, 6],
+    "timeout": 60000
+  },
+  "cities": [
+    "New York",
+    "Los Angeles",
+    "Miami",
+    "Chicago",
+    "San Francisco",
+    "Houston",
+    "Phoenix",
+    "Philadelphia",
+    "San Antonio",
+    "San Diego"
+  ],
+  "categories": [
+    "fashion",
+    "beauty",
+    "fitness",
+    "food",
+    "travel",
+    "tech",
+    "lifestyle",
+    "photography"
+  ]
+}

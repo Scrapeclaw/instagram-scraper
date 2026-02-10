@@ -1,0 +1,33 @@
+# Ignore data directories (large files, outputs)
+data/output/
+data/queue/
+data/*.json
+data/*.csv
+thumbnails/
+
+# Environment files with secrets
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Debug files
+debug_*/
+*.png
+login_error.png
