@@ -1,18 +1,17 @@
 # Instagram Profile Scraper
 
-A browser-based Instagram profile discovery and scraping tool using Playwright with anti-detection capabilities.
+A browser-based Instagram profile discovery and scraping tool.
 
 ```yaml
 ---
 name: instagram-browser-scraper
-description: Discover and scrape Instagram profiles using Google Custom Search API and Playwright browser automation with anti-detection
+description: Discover and scrape Instagram profiles from your browser.
 emoji: 📸
-version: 1.0.0
+version: 1.0.2
 author: influenza
 tags:
   - instagram
   - scraping
-  - playwright
   - social-media
   - influencer-discovery
 metadata:
@@ -41,18 +40,18 @@ metadata:
 
 This skill provides a two-phase Instagram scraping system:
 
-1. **Profile Discovery** - Find Instagram profiles using Google Custom Search API
-2. **Browser Scraping** - Scrape profile data using Playwright with anti-detection
+1. **Profile Discovery**  
+2. **Browser Scraping** 
 
 ## Features
 
-- 🔍 **Google Custom Search API Integration** - Discover Instagram profiles by location and category
-- 🌐 **Playwright Browser Automation** - Full browser simulation for accurate scraping
-- 🛡️ **Anti-Detection System** - Browser fingerprinting, human behavior simulation, and stealth scripts
-- 📊 **Comprehensive Data Extraction** - Profile info, stats, images, and engagement data
-- 💾 **Local Storage** - JSON/CSV export with downloaded thumbnails
-- 🔄 **Checkpoint System** - Resume interrupted scraping sessions
-- ⚡ **Smart Filtering** - Auto-skip private accounts, low followers, empty profiles
+- 🔍  - Discover Instagram profiles by location and category
+- 🌐  - Full browser simulation for accurate scraping
+- 🛡️  - Browser fingerprinting, human behavior simulation, and stealth scripts
+- 📊  - Profile info, stats, images, and engagement data
+- 💾  - JSON/CSV export with downloaded thumbnails
+- 🔄  - Resume interrupted scraping sessions
+- ⚡  - Auto-skip private accounts, low followers, empty profiles
 
 ## Installation
 
@@ -74,7 +73,7 @@ python -m playwright install chromium
 Create a `.env` file or set environment variables:
 
 ```env
-# Google Custom Search API (for discovery)
+# Google Custom Search API (for discovery - optional)
 GOOGLE_API_KEY=your_google_api_key
 GOOGLE_SEARCH_ENGINE_ID=your_search_engine_id
 
@@ -83,7 +82,7 @@ INSTAGRAM_USERNAME=your_instagram_username
 INSTAGRAM_PASSWORD=your_instagram_password
 ```
 
-#### Getting Google API Credentials
+#### Getting Google API Credentials (Optional)
 
 1. Go to [Google Cloud Console](https://console.cloud.google.com/)
 2. Create a new project or select existing
@@ -213,15 +212,7 @@ Edit `config/scraper_config.json`:
 }
 ```
 
-## Anti-Detection Features
 
-The skill includes multiple layers of anti-detection:
-
-- **Browser Fingerprinting**: Rotates realistic browser profiles (user agents, screen sizes, fonts)
-- **Human Behavior Simulation**: Random mouse movements, scroll patterns, timing delays
-- **Stealth Scripts**: Hides automation indicators (webdriver, plugins, etc.)
-- **Rate Limit Handling**: Detects and responds to Instagram rate limits
-- **Session Management**: Persists sessions across runs
 
 ## Filters Applied
 
@@ -253,6 +244,4 @@ The scraper automatically filters out:
 - Use multiple Instagram accounts
 - Run during off-peak hours
 
-## License
 
-MIT License
