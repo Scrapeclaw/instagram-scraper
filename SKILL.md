@@ -4,10 +4,10 @@ A browser-based Instagram profile discovery and scraping tool.
 
 ```yaml
 ---
-name: instagram-browser-scraper
+name: instagram-scraper
 description: Discover and scrape Instagram profiles from your browser.
 emoji: 📸
-version: 1.0.2
+version: 1.0.3
 author: influenza
 tags:
   - instagram
@@ -20,11 +20,7 @@ metadata:
       bins:
         - python3
         - chromium
-      env:
-        - GOOGLE_API_KEY
-        - GOOGLE_SEARCH_ENGINE_ID
-        - INSTAGRAM_USERNAME
-        - INSTAGRAM_PASSWORD
+
     config:
       stateDirs:
         - data/output
@@ -53,34 +49,7 @@ This skill provides a two-phase Instagram scraping system:
 - 🔄  - Resume interrupted scraping sessions
 - ⚡  - Auto-skip private accounts, low followers, empty profiles
 
-## Installation
 
-### 1. Install Python Dependencies
-
-```bash
-cd instagram-scraper
-pip install -r requirements.txt
-```
-
-### 2. Install Playwright Browser
-
-```bash
-python -m playwright install chromium
-```
-
-### 3. Configure Environment
-
-Create a `.env` file or set environment variables:
-
-```env
-# Google Custom Search API (for discovery - optional)
-GOOGLE_API_KEY=your_google_api_key
-GOOGLE_SEARCH_ENGINE_ID=your_search_engine_id
-
-# Instagram Credentials (for scraping)
-INSTAGRAM_USERNAME=your_instagram_username
-INSTAGRAM_PASSWORD=your_instagram_password
-```
 
 #### Getting Google API Credentials (Optional)
 
@@ -94,53 +63,16 @@ INSTAGRAM_PASSWORD=your_instagram_password
 
 ## Usage
 
-### CLI Commands
-
-#### Discover Profiles
-
-```bash
-# Interactive mode - prompts for location/category
-python main.py discover
-
-# With arguments
-python main.py discover --location "New York" --category "fashion" --count 20
-
-# Batch mode - multiple locations/categories
-python main.py discover --batch
-```
-
-#### Scrape Profiles
-
-```bash
-# Scrape from queue file
-python main.py scrape data/queue/NewYork_fashion_20250209.json
-
-# Scrape specific username
-python main.py scrape --username fashionblogger123
-
-# Scrape with engagement extraction (slower)
-python main.py scrape data/queue/file.json --extract-engagement
-
-# Resume interrupted session
-python main.py scrape data/queue/file.json --resume
-```
-
-#### List Queue Files
-
-```bash
-python main.py list
-```
-
 ### Agent Tool Interface
 
 For OpenClaw agent integration, the skill provides JSON output:
 
 ```bash
 # Discover profiles (returns JSON)
-python main.py discover --location "Miami" --category "fitness" --output json
+discover --location "Miami" --category "fitness" --output json
 
 # Scrape single profile (returns JSON)
-python main.py scrape --username influencer123 --output json
+scrape --username influencer123 --output json
 ```
 
 ## Output Data
