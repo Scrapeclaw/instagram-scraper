@@ -1,4 +1,11 @@
 {
+  "proxy": {
+    "enabled": false,
+    "provider": "brightdata",
+    "country": "",
+    "sticky": true,
+    "sticky_ttl_minutes": 10
+  },
   "google_search": {
     "enabled": true,
     "api_key": "",

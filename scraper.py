@@ -90,6 +90,15 @@ class InstagramScraper:
         from anti_detection import AntiDetectionManager
         self.anti_detection_mgr = AntiDetectionManager(DATA_DIR)
 
+        # Initialize proxy manager
+        from proxy_manager import ProxyManager
+        self.proxy_manager = ProxyManager.from_config(config_path or CONFIG_PATH)
+        if not self.proxy_manager.enabled:
+            # Fall back to environment variables
+            self.proxy_manager = ProxyManager.from_env()
+        if self.proxy_manager.enabled:
+            logger.info(f"Proxy enabled: {self.proxy_manager.info()}")
+
     def _load_config(self, config_path: Path) -> Dict:
         """Load configuration from JSON file"""
         try:
@@ -116,20 +125,30 @@ class InstagramScraper:
         
         self.playwright = await async_playwright().start()
 
+        # Build launch options
+        launch_args = [
+            '--disable-blink-features=AutomationControlled',
+            '--disable-dev-shm-usage',
+            '--no-sandbox',
+            '--disable-setuid-sandbox',
+        ]
+
         self.browser = await self.playwright.chromium.launch(
             headless=headless,
-            args=[
-                '--disable-blink-features=AutomationControlled',
-                '--disable-dev-shm-usage',
-                '--no-sandbox',
-                '--disable-setuid-sandbox',
-            ]
+            args=launch_args,
         )
 
         # Apply fingerprint
         fingerprint_mgr = BrowserFingerprint(DATA_DIR)
         fingerprint = fingerprint_mgr.get_random_fingerprint(self.username)
         context_options = fingerprint_mgr.get_context_options(fingerprint)
+
+        # Inject proxy into browser context if enabled
+        proxy_settings = self.proxy_manager.get_playwright_proxy() if self.proxy_manager.enabled else None
+        if proxy_settings:
+            context_options['proxy'] = proxy_settings
+            logger.info(f"Browser using proxy: {self.proxy_manager.provider} → {self.proxy_manager.host}:{self.proxy_manager.port}")
+
         self.context = await self.browser.new_context(**context_options)
 
         self.page = await self.context.new_page()
