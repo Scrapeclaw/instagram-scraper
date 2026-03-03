@@ -288,21 +288,53 @@ class ApifyInstagramScraper:
 # Proxy validation helper
 # ---------------------------------------------------------------------------
 async def validate_proxy(proxy_url: str) -> bool:
-    """Quick connectivity check using httpbin.org through the proxy."""
+    """Quick connectivity check through the proxy using a reliable endpoint."""
+    from playwright.async_api import async_playwright
+    
+    # Residential proxies are slower; use longer timeout
+    is_residential = "RESIDENTIAL" in proxy_url.upper()
+    # default to 60s for any proxy (datacenter can still be slow on Apify)
+    timeout_ms = 120000 if is_residential else 60000
+    
+    # Try multiple endpoints in case one is blocked
+    endpoints = [
+        "https://www.google.com",
+        "https://www.instagram.com",
+        "https://httpbin.org/ip",
+    ]
+    
+    pw = None
     try:
-        from playwright.async_api import async_playwright
         pw = await async_playwright().start()
         browser = await pw.chromium.launch(headless=True)
         ctx = await browser.new_context(proxy={"server": proxy_url})
         page = await ctx.new_page()
-        await page.goto("https://httpbin.org/ip", timeout=30000)
-        content = await page.content()
-        logger.info(f"Proxy validation OK. Response: {content[:150]}")
+        
+        for endpoint in endpoints:
+            try:
+                logger.info(f"Validating proxy via {endpoint}…")
+                await page.goto(endpoint, timeout=timeout_ms, wait_until="domcontentloaded")
+                logger.info(f"✓ Proxy validation successful via {endpoint}")
+                await browser.close()
+                await pw.stop()
+                return True
+            except Exception as e:
+                logger.debug(f"  Endpoint {endpoint} failed: {e}")
+                continue
+        
+        # If all endpoints fail
+        logger.error(f"Proxy validation failed: all endpoints unreachable (timeout={timeout_ms}ms)")
         await browser.close()
         await pw.stop()
-        return True
+        return False
+        
     except Exception as exc:
-        logger.error(f"Proxy validation failed: {exc}")
+        logger.error(f"Proxy validation error: {exc}")
+        if pw:
+            try:
+                await pw.stop()
+            except:
+                pass
         return False
 
 

@@ -402,8 +402,10 @@ class InstagramScraper:
 
                 const statsText = document.body.innerText;
 
-                const postsMatch = statsText.match(/([\d,KkMm.]+)\s+post/i);
-                const followersMatch = statsText.match(/([\d,KkMm.]+)\s+follower/i);
+                // Instagram typically shows "X posts" and "Y followers" – plural forms
+                // The regexes below allow both singular and plural just in case
+                const postsMatch = statsText.match(/([\d,KkMm.]+)\s+posts?/i);
+                const followersMatch = statsText.match(/([\d,KkMm.]+)\s+followers?/i);
                 const followingMatch = statsText.match(/([\d,KkMm.]+)\s+following/i);
 
                 function parseCount(text) {
@@ -417,6 +419,17 @@ class InstagramScraper:
                 data.posts_count = postsMatch ? parseCount(postsMatch[1]) : 0;
                 data.followers = followersMatch ? parseCount(followersMatch[1]) : 0;
                 data.following = followingMatch ? parseCount(followingMatch[1]) : 0;
+
+                // fallback: look for followers link if regex failed
+                if (!data.followers) {
+                    const followerLink = document.querySelector('a[href$="/followers/"] span');
+                    if (followerLink && followerLink.innerText) {
+                        data.followers = parseCount(followerLink.innerText);
+                    }
+                }
+
+                // include raw stats text for debugging when parsing fails
+                data.stats_text = statsText;
 
                 // Get bio
                 const bioSelectors = ['header section div span', '._aa_c'];
@@ -460,6 +473,13 @@ class InstagramScraper:
             if profile_data.get('is_private'):
                 logger.warning(f"Skipping private account: {username}")
                 return None
+
+            # debug: unexpected zero follower count
+            if profile_data.get('followers', 0) == 0:
+                logger.debug(
+                    f"parsed zero followers for {username}; stats text=\n" \
+                    f"{profile_data.get('stats_text','')[:300]}"
+                )
 
             # Check minimum followers
             min_followers = self.config.get('scraper', {}).get('min_followers', 1000)
