@@ -184,8 +184,11 @@ class ApifyInstagramScraper:
         # Inject Apify proxy into proxy_manager so start_browser picks it up
         if self.proxy_url:
             inst.proxy_manager.enabled = True
-            inst.proxy_manager.get_playwright_proxy = lambda: {"server": self.proxy_url}
-            logger.info(f"Proxy injected: {self.proxy_url[:50]}…")
+            # override with the parsed Apify proxy options so Playwright receives
+            # separate username/password fields rather than a raw URL string.
+            inst.proxy_manager.get_playwright_proxy = lambda: _parse_proxy_url(self.proxy_url)
+            parsed = _parse_proxy_url(self.proxy_url)
+            logger.info(f"Proxy injected: {parsed.get('server')} (credentials hidden)")
 
         await inst.start_browser(headless=True)
 
@@ -287,47 +290,101 @@ class ApifyInstagramScraper:
 # ---------------------------------------------------------------------------
 # Proxy validation helper
 # ---------------------------------------------------------------------------
+def _parse_proxy_url(proxy_url: str) -> Dict[str, str]:
+    """Break an Apify proxy URL into Playwright-friendly components.
+
+    The URL returned by ``proxy_configuration.new_url()`` contains the
+    username/password embedded (e.g. ``http://user:pass@proxy.apify.com:8000``).
+    Playwright does **not** accept credentials as part of the ``server`` value,
+    so we split them out here and return a dict with ``server`` plus optional
+    ``username``/``password`` keys.
+    """
+    from urllib.parse import urlparse
+
+    parsed = urlparse(proxy_url)
+    server = f"{parsed.scheme}://{parsed.hostname}:{parsed.port}"
+    result = {"server": server}
+    if parsed.username:
+        result["username"] = parsed.username
+    if parsed.password:
+        result["password"] = parsed.password
+    return result
+
+
 async def validate_proxy(proxy_url: str) -> bool:
-    """Quick connectivity check through the proxy using a reliable endpoint."""
+    """Quick connectivity check through the proxy using a reliable endpoint.
+
+    To avoid long delays (which previously caused actor timeouts), we run
+    multiple endpoints in parallel with modest per-endpoint timeouts and a
+    total budget.  The first successful connection wins, and remaining tasks
+    are cancelled immediately.
+
+    A user can skip validation altogether by setting the environment variable
+    ``SKIP_PROXY_VALIDATION`` (useful when proxies are known to be slow but
+    expected to work).
+    """
+    # allow skipping in environments where proxy validation is flaky/slow
+    if os.getenv("SKIP_PROXY_VALIDATION"):
+        logger.info("Skipping proxy validation due to SKIP_PROXY_VALIDATION flag")
+        return True
+
     from playwright.async_api import async_playwright
-    
-    # Residential proxies are slower; use longer timeout
-    is_residential = "RESIDENTIAL" in proxy_url.upper()
-    # default to 60s for any proxy (datacenter can still be slow on Apify)
-    timeout_ms = 120000 if is_residential else 60000
-    
-    # Try multiple endpoints in case one is blocked
+    import asyncio
+
+    # define endpoints to probe; order doesn't matter as we run them concurrently
     endpoints = [
         "https://www.google.com",
         "https://www.instagram.com",
         "https://httpbin.org/ip",
     ]
-    
+
+    # choose reasonable timeouts
+    is_residential = "RESIDENTIAL" in proxy_url.upper()
+    per_endpoint_timeout = 30000 if is_residential else 20000  # ms
+    overall_timeout = 60000  # give up after 60 seconds regardless
+
+    async def _check(endpoint: str) -> bool:
+        try:
+            logger.info(f"Validating proxy via {endpoint}…")
+            # create a fresh page per endpoint to avoid shared state
+            p = await ctx.new_page()
+            await p.goto(endpoint, timeout=per_endpoint_timeout, wait_until="domcontentloaded")
+            await p.close()
+            logger.info(f"✓ Proxy validation successful via {endpoint}")
+            return True
+        except Exception as e:
+            logger.debug(f"  Endpoint {endpoint} failed: {e}")
+            return False
+
     pw = None
     try:
         pw = await async_playwright().start()
         browser = await pw.chromium.launch(headless=True)
-        ctx = await browser.new_context(proxy={"server": proxy_url})
-        page = await ctx.new_page()
-        
-        for endpoint in endpoints:
-            try:
-                logger.info(f"Validating proxy via {endpoint}…")
-                await page.goto(endpoint, timeout=timeout_ms, wait_until="domcontentloaded")
-                logger.info(f"✓ Proxy validation successful via {endpoint}")
-                await browser.close()
-                await pw.stop()
-                return True
-            except Exception as e:
-                logger.debug(f"  Endpoint {endpoint} failed: {e}")
-                continue
-        
-        # If all endpoints fail
-        logger.error(f"Proxy validation failed: all endpoints unreachable (timeout={timeout_ms}ms)")
+        # parse the url into server/credentials
+        proxy_opts = _parse_proxy_url(proxy_url)
+        ctx = await browser.new_context(proxy=proxy_opts)
+
+        tasks = [asyncio.create_task(_check(ep)) for ep in endpoints]
+        done, pending = await asyncio.wait(tasks, timeout=overall_timeout, return_when=asyncio.FIRST_COMPLETED)
+
+        success = False
+        for task in done:
+            if task.result():
+                success = True
+                break
+
+        # cancel remaining tasks if any
+        for task in pending:
+            task.cancel()
+
         await browser.close()
         await pw.stop()
-        return False
-        
+        if success:
+            return True
+        else:
+            logger.error("Proxy validation failed: no endpoint responded within budget")
+            return False
+
     except Exception as exc:
         logger.error(f"Proxy validation error: {exc}")
         if pw:
@@ -336,6 +393,7 @@ async def validate_proxy(proxy_url: str) -> bool:
             except:
                 pass
         return False
+
 
 
 # ---------------------------------------------------------------------------
@@ -379,17 +437,32 @@ async def main():
                 )
                 if proxy_configuration:
                     proxy_url = await proxy_configuration.new_url()
-                    logger.info(f"Using Apify proxy: {proxy_url[:50]}…")
+                # hide the credentials in logs
+                safe = _parse_proxy_url(proxy_url).get('server')
+                logger.info(f"Using Apify proxy: {safe}")
             except Exception as exc:
                 logger.warning(f"Could not create proxy configuration: {exc}")
 
-        # Validate proxy
+        # Validate proxy (unless user explicitly opts out)
         if proxy_url:
-            logger.info("Validating proxy connectivity via httpbin.org…")
-            ok = await validate_proxy(proxy_url)
-            if not ok:
-                logger.warning("Proxy validation failed — proceeding without proxy.")
-                proxy_url = None
+            skip_strict = actor_input.get("skipProxyValidation", False)
+            if skip_strict:
+                logger.info("Skipping strict proxy validation (skipProxyValidation=true)")
+            else:
+                logger.info("Validating proxy connectivity…")
+                ok = await validate_proxy(proxy_url)
+                if not ok:
+                    # some proxies (especially residential groups) may block common
+                    # test sites while still working for Instagram.  we warn but keep
+                    # the proxy unless the user asked us to drop it.
+                    if actor_input.get("dropProxyOnFailure", False):
+                        logger.warning("Proxy validation failed — removing proxy and running direct.")
+                        proxy_url = None
+                    else:
+                        logger.warning(
+                            "Proxy validation failed — continuing with proxy anyway. "
+                            "You can set dropProxyOnFailure=true to disable it."
+                        )
 
         # ----------------------------------------------------------------
         # 3. Build config and write temp config file
