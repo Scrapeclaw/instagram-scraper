@@ -1,0 +1,46 @@
+{
+  "actorSpecification": 1,
+  "name": "instagram-profile-scraper",
+  "title": "Instagram Profile Scraper & Discovery",
+  "description": "Discovers and scrapes Instagram influencer profiles by category and location. Returns follower counts, engagement metrics, bio, post thumbnails, and influencer tier — requires Instagram credentials.",
+  "version": "1.0",
+  "input": "./input_schema.json",
+  "dockerfile": "../Dockerfile",
+  "storages": {
+    "dataset": {
+      "actorSpecification": 1,
+      "views": {
+        "overview": {
+          "title": "Profile Results",
+          "transformation": {
+            "fields": [
+              "username",
+              "full_name",
+              "followers",
+              "following",
+              "posts_count",
+              "influencer_tier",
+              "is_verified",
+              "is_private",
+              "category",
+              "location",
+              "scrape_timestamp"
+            ]
+          },
+          "display": {
+            "component": "table",
+            "properties": {
+              "username":       { "label": "Username",    "format": "text" },
+              "full_name":      { "label": "Full Name",   "format": "text" },
+              "followers":      { "label": "Followers",   "format": "number" },
+              "influencer_tier":{ "label": "Tier",        "format": "text" },
+              "is_verified":    { "label": "Verified",    "format": "boolean" },
+              "category":       { "label": "Category",   "format": "text" },
+              "location":       { "label": "Location",   "format": "text" }
+            }
+          }
+        }
+      }
+    }
+  }
+}

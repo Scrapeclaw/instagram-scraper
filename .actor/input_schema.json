@@ -1,0 +1,112 @@
+{
+  "title": "Instagram Profile Scraper",
+  "description": "Discovers and scrapes Instagram influencer profiles by category and location.",
+  "type": "object",
+  "schemaVersion": 1,
+  "properties": {
+    "mode": {
+      "title": "Run Mode",
+      "type": "string",
+      "enum": ["full", "discovery_only", "scrape_profiles"],
+      "enumTitles": [
+        "Full (discover + scrape)",
+        "Discovery only (find usernames)",
+        "Scrape specific profiles"
+      ],
+      "default": "full",
+      "description": "full = discover usernames then scrape them; discovery_only = only find usernames; scrape_profiles = scrape the profileUsernames list directly.",
+      "editor": "select"
+    },
+    "instagramUsername": {
+      "title": "Instagram Username",
+      "type": "string",
+      "description": "Instagram account username used to log in. Required for scraping.",
+      "editor": "textfield"
+    },
+    "instagramPassword": {
+      "title": "Instagram Password",
+      "type": "string",
+      "description": "Instagram account password. Stored securely as a secret.",
+      "editor": "textfield",
+      "isSecret": true
+    },
+    "categories": {
+      "title": "Categories",
+      "type": "array",
+      "description": "Content categories to discover (fashion, beauty, fitness, food, travel, tech, etc.).",
+      "editor": "stringList",
+      "items": { "type": "string" },
+      "default": ["fashion", "beauty", "fitness", "food", "travel", "lifestyle"]
+    },
+    "locations": {
+      "title": "Locations",
+      "type": "array",
+      "description": "Cities or regions to search within.",
+      "editor": "stringList",
+      "items": { "type": "string" },
+      "default": ["New York", "Los Angeles", "Miami", "Chicago", "San Francisco"]
+    },
+    "profileUsernames": {
+      "title": "Profile Usernames (scrape_profiles mode)",
+      "type": "array",
+      "description": "List of Instagram usernames to scrape directly. Used when mode = scrape_profiles.",
+      "editor": "stringList",
+      "items": { "type": "string" },
+      "example": ["natgeo", "leomessi", "cristiano"]
+    },
+    "maxProfiles": {
+      "title": "Max Profiles to Scrape",
+      "type": "integer",
+      "description": "Maximum number of profiles to scrape (0 = unlimited).",
+      "default": 50,
+      "minimum": 0,
+      "maximum": 10000,
+      "editor": "number"
+    },
+    "minFollowers": {
+      "title": "Minimum Followers Filter",
+      "type": "integer",
+      "description": "Skip profiles with fewer followers than this value (0 = no filter).",
+      "default": 1000,
+      "minimum": 0,
+      "editor": "number"
+    },
+    "downloadThumbnails": {
+      "title": "Download Thumbnails to Key-Value Store",
+      "type": "boolean",
+      "description": "If enabled, profile pictures and content thumbnails are stored in the actor's Key-Value store.",
+      "default": false,
+      "editor": "checkbox"
+    },
+    "maxThumbnailsPerProfile": {
+      "title": "Max Content Thumbnails Per Profile",
+      "type": "integer",
+      "description": "Number of content post thumbnails to download per profile.",
+      "default": 6,
+      "minimum": 0,
+      "maximum": 20,
+      "editor": "number"
+    },
+    "googleApiKey": {
+      "title": "Google Custom Search API Key (optional)",
+      "type": "string",
+      "description": "Google API key for Custom Search. If not set, DuckDuckGo is used as fallback.",
+      "editor": "textfield",
+      "isSecret": true
+    },
+    "googleSearchEngineId": {
+      "title": "Google Search Engine ID (optional)",
+      "type": "string",
+      "description": "Google Custom Search Engine ID (cx). Required only if googleApiKey is set.",
+      "editor": "textfield"
+    },
+    "proxyConfiguration": {
+      "title": "Proxy Configuration",
+      "type": "object",
+      "description": "Apify proxy settings. Residential proxies recommended for Instagram.",
+      "prefill": { "useApifyProxy": true, "apifyProxyGroups": ["RESIDENTIAL"] },
+      "editor": "proxy"
+    }
+  },
+  "required": ["instagramUsername", "instagramPassword"]
+}

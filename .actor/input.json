@@ -1,0 +1,18 @@
+{
+  "mode": "full",
+  "region": "ind",
+  "instagramUsername": "your_instagram_username",
+  "instagramPassword": "your_instagram_password",
+  "categories": ["food", "travel", "fashion", "fitness"],
+  "locations": ["Mumbai", "Delhi", "Bangalore", "Chennai"],
+  "maxProfiles": 20,
+  "minFollowers": 5000,
+  "downloadThumbnails": false,
+  "maxThumbnailsPerProfile": 6,
+  "googleApiKey": "",
+  "googleSearchEngineId": "",
+  "proxyConfiguration": {
+    "useApifyProxy": true,
+    "apifyProxyGroups": ["RESIDENTIAL"]
+  }
+}

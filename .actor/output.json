@@ -1,0 +1,77 @@
+[
+  {
+    "username": "travelwithpriya",
+    "full_name": "Priya Sharma",
+    "bio": "✈️ Exploring India one city at a time | Travel blogger | Collab: priya@example.com",
+    "followers": 85000,
+    "following": 1200,
+    "posts_count": 342,
+    "is_verified": false,
+    "is_private": false,
+    "influencer_tier": "micro",
+    "category": "travel",
+    "location": "Mumbai",
+    "profile_pic_url": "https://instagram.com/path/to/profile_pic.jpg",
+    "profile_url": "https://www.instagram.com/travelwithpriya/",
+    "website": "https://travelwithpriya.com",
+    "email": "priya@example.com",
+    "phone": "",
+    "engagement_rate": 4.2,
+    "avg_likes": 3200,
+    "avg_comments": 85,
+    "content_thumbnails": [
+      "https://instagram.com/path/to/post1.jpg",
+      "https://instagram.com/path/to/post2.jpg",
+      "https://instagram.com/path/to/post3.jpg"
+    ],
+    "recent_posts": [
+      {
+        "url": "https://www.instagram.com/p/ABC123/",
+        "likes": 3450,
+        "comments": 92,
+        "timestamp": "2025-02-20T14:30:00Z"
+      },
+      {
+        "url": "https://www.instagram.com/p/DEF456/",
+        "likes": 2980,
+        "comments": 78,
+        "timestamp": "2025-02-18T09:15:00Z"
+      }
+    ],
+    "scrape_timestamp": "2025-02-26T10:30:00Z"
+  },
+  {
+    "username": "foodiedelhi",
+    "full_name": "Rahul Mehta",
+    "bio": "🍜 Delhi Food Explorer | Restaurant Reviews | DM for collabs",
+    "followers": 22000,
+    "following": 850,
+    "posts_count": 189,
+    "is_verified": false,
+    "is_private": false,
+    "influencer_tier": "micro",
+    "category": "food",
+    "location": "Delhi",
+    "profile_pic_url": "https://instagram.com/path/to/profile_pic2.jpg",
+    "profile_url": "https://www.instagram.com/foodiedelhi/",
+    "website": "",
+    "email": "",
+    "phone": "",
+    "engagement_rate": 6.1,
+    "avg_likes": 1200,
+    "avg_comments": 54,
+    "content_thumbnails": [
+      "https://instagram.com/path/to/food1.jpg",
+      "https://instagram.com/path/to/food2.jpg"
+    ],
+    "recent_posts": [
+      {
+        "url": "https://www.instagram.com/p/GHI789/",
+        "likes": 1450,
+        "comments": 61,
+        "timestamp": "2025-02-25T18:00:00Z"
+      }
+    ],
+    "scrape_timestamp": "2025-02-26T10:45:00Z"
+  }
+]
