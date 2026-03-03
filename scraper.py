@@ -402,8 +402,10 @@ class InstagramScraper:
 
                 const statsText = document.body.innerText;
 
-                const postsMatch = statsText.match(/([\d,KkMm.]+)\s+post/i);
-                const followersMatch = statsText.match(/([\d,KkMm.]+)\s+follower/i);
+                // Instagram typically shows "X posts" and "Y followers" – plural forms
+                // The regexes below allow both singular and plural just in case
+                const postsMatch = statsText.match(/([\d,KkMm.]+)\s+posts?/i);
+                const followersMatch = statsText.match(/([\d,KkMm.]+)\s+followers?/i);
                 const followingMatch = statsText.match(/([\d,KkMm.]+)\s+following/i);
 
                 function parseCount(text) {
