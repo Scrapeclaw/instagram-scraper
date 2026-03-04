@@ -9,7 +9,7 @@ A browser-based Instagram profile discovery and scraping tool.
 name: instagram-scraper
 description: Discover and scrape Instagram profiles from your browser.
 emoji: 📸
-version: 1.0.3
+version: 1.0.6
 author: influenza
 tags:
   - instagram
