@@ -154,78 +154,6 @@ Each scraped profile is saved to `data/output/{username}.json`:
 
 ---
 
-## 🌐 Residential Proxy (Recommended for Scale)
-
-Running long scraping sessions without a residential proxy will get your IP blocked. The built-in proxy manager handles rotation, sticky sessions, and country targeting automatically.
-
-### Why Use a Residential Proxy?
-
-- ✅ Avoid IP bans — residential IPs look like real users to Instagram
-- ✅ Rotate IPs automatically on every request or session
-- ✅ Sticky sessions — keep the same IP during a login session
-- ✅ Geo-target by country for locale-accurate content
-- ✅ 95%+ success rates vs ~30% with datacenter proxies
-
-### Recommended Providers
-
-We have affiliate partnerships with the following providers. Using these links supports this project at no extra cost to you:
-
-| Provider | Highlights | Sign Up |
-|----------|-----------|---------|
-| **Bright Data** | World's largest network, 72M+ IPs, enterprise-grade | 👉 [**Get Bright Data**](https://get.brightdata.com/o1kpd2da8iv4) |
-| **IProyal** | Pay-as-you-go, 195+ countries, no traffic expiry | 👉 [**Get IProyal**](https://iproyal.com/?r=ScrapeClaw) |
-| **Storm Proxies** | Fast & reliable, developer-friendly API, competitive pricing | 👉 [**Get Storm Proxies**](https://stormproxies.com/clients/aff/go/scrapeclaw) |
-| **NetNut** | ISP-grade network, 52M+ IPs, direct connectivity | 👉 [**Get NetNut**](https://netnut.io?ref=mwrlzwv) |
-
-> These are affiliate links. We may earn a commission at no extra cost to you.
-
-### Enabling the Proxy
-
-**Option 1 — Environment variables (recommended):**
-
-```bash
-export PROXY_ENABLED=true
-export PROXY_PROVIDER=brightdata        # brightdata | iproyal | stormproxies | netnut | custom
-export PROXY_USERNAME=your_proxy_user
-export PROXY_PASSWORD=your_proxy_pass
-export PROXY_COUNTRY=us                 # optional
-export PROXY_STICKY=true                # keeps same IP per session
-```
-
-**Option 2 — `config/scraper_config.json`:**
-
-```json
-{
-  "proxy": {
-    "enabled": true,
-    "provider": "brightdata",
-    "country": "us",
-    "sticky": true,
-    "sticky_ttl_minutes": 10
-  }
-}
-```
-
-Set credentials via env vars (`PROXY_USERNAME`, `PROXY_PASSWORD`) — never hardcode them in the config file.
-
-### Provider Host/Port Reference
-
-| Provider | Host | Port |
-|----------|------|------|
-| Bright Data | `brd.superproxy.io` | `22225` |
-| IProyal | `proxy.iproyal.com` | `12321` |
-| Storm Proxies | `rotating.stormproxies.com` | `9999` |
-| NetNut | `gw-resi.netnut.io` | `5959` |
-
-Once configured, the scraper uses the proxy automatically — no extra flags needed. The log confirms it:
-
-```
-INFO - Proxy enabled: <ProxyManager provider=brightdata enabled host=brd.superproxy.io:22225>
-INFO - Browser using proxy: brightdata → brd.superproxy.io:22225
-```
-
----
-
 ## Configuration Reference
 
 Edit `config/scraper_config.json` to customise behaviour:
@@ -290,6 +218,36 @@ This scraper is one of several tools in the **[ScrapeClaw](https://www.scrapecla
 | 🐦 **X / Twitter** | Tweets, profiles & engagement metrics | [GitHub](https://github.com/Scrapeclaw/twitter-scraper) · [ClawHub](https://clawhub.ai/ArulmozhiV/x-twitter-scraper) |
 
 All scrapers share the same anti-detection foundation, proxy support, and JSON/CSV export pipeline.
+
+---
+
+## 🚀 ScrapeClaw Customised Solutions
+
+> **We build, you own.** No per-credit fees. Stop renting data — own your entire scraping infrastructure.
+
+ScrapeClaw offers two commercial offerings for teams and businesses that need more than open-source:
+
+### 📦 Tailored Datasets
+
+Get pre-scraped or on-demand datasets built around your exact industry, platform, or niche — delivered ready for analysis.
+
+- Industry-specific social media datasets on demand
+- Custom extraction logic ("Skills") for your use case
+- One-time delivery or recurring data feeds
+- Output in CSV, JSON, or direct database delivery
+
+👉 [**Request a Dataset →**](https://www.scrapeclaw.cc/)
+
+### 🏗️ Private Infrastructure Setup ★ High Value
+
+We deploy a turnkey ScrapeClaw system on your own servers — you own 100% of the infrastructure and the data.
+
+- 🔒 **Privacy & Compliance** — data never leaves your network, ideal for FinTech & Health
+- 🤖 **Self-Healing Agents** — AI-powered scrapers that adapt when sites change
+- 💸 **Slash API Costs** — stop paying $1–5 per 1K requests; scrape 1M rows at flat infra cost
+- Includes **1 month of managed maintenance & support**
+
+👉 [**Book a Strategy Call →**](https://www.scrapeclaw.cc/)
 
 ---
 
